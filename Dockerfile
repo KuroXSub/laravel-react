@@ -2,6 +2,8 @@ FROM php:8.2-fpm
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
+    gnupg \
+    curl \
     build-essential \
     default-mysql-client \
     libpng-dev \
@@ -14,8 +16,10 @@ RUN apt-get update && apt-get install -y \
     vim \
     unzip \
     git \
-    curl \
     --no-install-recommends \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    # Cleanup
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
