@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     locales \
     zip \
-    jpegoptim optpng pngquant gifsicle \
+    jpegoptim optipng pngquant gifsicle \
     vim \
     unzip \
     git \
