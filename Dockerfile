@@ -3,20 +3,26 @@ FROM php:8.1-fpm
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
-    mysql-client \
+    default-mysql-client \
     libpng-dev \
-    libjpeg62-turbo-dev \
+    libjpeg-dev \
     libfreetype6-dev \
     locales \
     zip \
-    jpegoptim optipng pngquant gifsicle \
+    jpegoptim optpng pngquant gifsicle \
     vim \
     unzip \
     git \
-    curl
+    curl \
+    --no-install-recommends \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath
+# Konfigurasi dan install GD dengan dukungan jpeg dan freetype
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
