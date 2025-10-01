@@ -1,0 +1,51 @@
+# Versi file compose
+version: '3.8'
+
+# Definisi layanan/kontainer
+services:
+  # Kontainer untuk aplikasi Laravel
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: namauser/laravel-app
+    container_name: laravel_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    networks:
+      - laravel
+
+  # Kontainer untuk web server Nginx
+  nginx:
+    image: nginx:1.19-alpine
+    container_name: laravel_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - laravel
+
+  # Kontainer untuk database MySQL
+  db:
+    image: mysql:8.0
+    container_name: laravel_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    volumes:
+      - ./docker/dbdata:/var/lib/mysql
+    networks:
+      - laravel
+
+# Definisi jaringan
+networks:
+  laravel:
+    driver: bridge
