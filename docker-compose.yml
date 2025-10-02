@@ -24,9 +24,13 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+      - "443:443" # Buka port 443 untuk HTTPS
     volumes:
       - ./:/var/www
       - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      # Tambahkan volume untuk sertifikat dan verifikasi
+      - ./docker/certbot/conf:/etc/letsencrypt
+      - ./docker/certbot/www:/var/www/certbot
     networks:
       - laravel
 
@@ -44,6 +48,16 @@ services:
       - ./docker/dbdata:/var/lib/mysql
     networks:
       - laravel
+
+  certbot:
+    image: certbot/certbot
+    container_name: laravel_certbot
+    volumes:
+      # Volume yang sama dengan nginx
+      - ./docker/certbot/conf:/etc/letsencrypt
+      - ./docker/certbot/www:/var/www/certbot
+    # Perintah dummy agar kontainer tidak langsung mati
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 # Definisi jaringan
 networks:
